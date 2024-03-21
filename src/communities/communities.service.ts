@@ -12,7 +12,7 @@ export class CommunitiesService {
   ) {}
 
   findAll() {
-    return `This action returns all communities`;
+    return 'This action returns all communities';
   }
 
   findOne(id: number) {

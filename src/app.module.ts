@@ -1,11 +1,14 @@
+import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CommunitiesModule } from './communities/communities.module';
 import { PostsModule } from './posts/posts.module';
-import { TasksService } from './tasks/tasks.service';
-import { ConfigModule } from '@nestjs/config';
+import { PROCESS_QUEUE_NAME } from './tasks/tasks.constants';
+import { TaskConsumerService } from './tasks/tasks.consumer';
+import { TaskProducerService } from './tasks/tasks.producer';
 
 @Module({
   imports: [
@@ -20,11 +23,18 @@ import { ConfigModule } from '@nestjs/config';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+    BullModule.registerQueue({ name: PROCESS_QUEUE_NAME }),
     ScheduleModule.forRoot(),
     CommunitiesModule,
     PostsModule,
   ],
   controllers: [],
-  providers: [TasksService],
+  providers: [TaskProducerService, TaskConsumerService],
 })
 export class AppModule {}
