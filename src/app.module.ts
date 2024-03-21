@@ -23,14 +23,15 @@ import { TaskProducerService } from './tasks/tasks.producer';
       autoLoadEntities: true,
       synchronize: true,
     }),
+
     BullModule.forRoot({
-      redis: {
-        host: 'localhost',
-        port: 6379,
-      },
+      redis: { host: 'localhost', port: 6379 },
+      defaultJobOptions: { attempts: 5, backoff: { type: 'exponential' } },
     }),
     BullModule.registerQueue({ name: PROCESS_QUEUE_NAME }),
     ScheduleModule.forRoot(),
+
+    // REST API modules
     CommunitiesModule,
     PostsModule,
   ],
